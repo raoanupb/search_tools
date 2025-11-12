@@ -1,0 +1,15 @@
+# Core dependencies
+requests>=2.31.0
+
+# For Google Search (web scraping)
+playwright>=1.40.0
+
+# For DuckDuckGo Search
+duckduckgo-search>=4.0.0
+
+# Optional but recommended for development
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.7.0
