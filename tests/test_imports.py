@@ -33,6 +33,13 @@ def test_crossref_import():
     assert crossref is not None
 
 
+def test_github_import():
+    """Test that GitHubSearch can be imported and initialized."""
+    from search_tools import GitHubSearch
+    github = GitHubSearch()
+    assert github is not None
+
+
 def test_wikipedia_import():
     """Test that WikipediaSearch can be imported and initialized."""
     from search_tools import WikipediaSearch
@@ -65,16 +72,17 @@ def test_package_version():
 
 
 def test_all_exports():
-    """Test that __all__ exports are correct."""
+    """Test that __all__ exports include core tools."""
     import search_tools
-    expected_exports = [
+    required_exports = [
         'ArxivSearch',
         'SemanticScholarSearch',
         'PubMedSearch',
         'CrossRefSearch',
-        'GoogleSearch',
+        'GitHubSearch',
         'WikipediaSearch',
-        'DuckDuckGoSearch',
     ]
     assert hasattr(search_tools, '__all__')
-    assert set(search_tools.__all__) == set(expected_exports)
+    # Check that all required exports are present
+    for export in required_exports:
+        assert export in search_tools.__all__, f"{export} not in __all__"

@@ -6,6 +6,7 @@ This package provides various search capabilities including:
 - Semantic Scholar: Multi-disciplinary academic search
 - PubMed: Biomedical and life sciences literature
 - CrossRef: DOI-based academic paper search
+- GitHub: Code and repository search
 - Google: General web search
 - Wikipedia: Encyclopedia search
 - DuckDuckGo: Privacy-focused web search
@@ -17,6 +18,7 @@ from .semantic_scholar_search import SemanticScholarSearch
 from .pubmed_search import PubMedSearch
 from .crossref_search import CrossRefSearch
 from .wikipedia_search import WikipediaSearch
+from .github_search import GitHubSearch
 
 # Import tools with optional dependencies
 __all__ = [
@@ -25,6 +27,7 @@ __all__ = [
     'PubMedSearch',
     'CrossRefSearch',
     'WikipediaSearch',
+    'GitHubSearch',
 ]
 
 # Try to import GoogleSearch (requires playwright)

@@ -9,6 +9,7 @@ from search_tools import (
     SemanticScholarSearch,
     PubMedSearch,
     CrossRefSearch,
+    GitHubSearch,
     GoogleSearch,
     WikipediaSearch,
     DuckDuckGoSearch
@@ -109,6 +110,30 @@ def demo_crossref():
         print(f"   DOI: {pub.get('DOI', 'N/A')}")
 
 
+def demo_github():
+    """Demonstrate GitHub search."""
+    print("\n" + "=" * 80)
+    print("GITHUB SEARCH DEMO")
+    print("=" * 80)
+
+    github = GitHubSearch()
+
+    # Search repositories
+    print("\nSearching for popular Python ML repositories...")
+    results = github.search_repositories(
+        "machine learning",
+        language="python",
+        min_stars=10000,
+        per_page=3
+    )
+
+    for i, repo in enumerate(results['items'], 1):
+        print(f"\n{i}. {repo['full_name']}")
+        print(f"   ⭐ Stars: {repo['stars']:,}")
+        print(f"   Description: {repo['description'][:80]}..." if repo['description'] else "")
+        print(f"   URL: {repo['url']}")
+
+
 def demo_wikipedia():
     """Demonstrate Wikipedia search."""
     print("\n" + "=" * 80)
@@ -196,6 +221,7 @@ def main():
     demo_semantic_scholar()
     demo_pubmed()
     demo_crossref()
+    demo_github()
     demo_wikipedia()
     demo_duckduckgo()
     demo_google()  # May fail due to rate limiting

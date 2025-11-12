@@ -4,7 +4,7 @@ A comprehensive collection of search tools designed for language agents, providi
 
 ## Features
 
-- **Multiple Search Engines**: Arxiv, Semantic Scholar, PubMed, CrossRef, Google, Wikipedia, DuckDuckGo
+- **Multiple Search Engines**: Arxiv, Semantic Scholar, PubMed, CrossRef, GitHub, Google, Wikipedia, DuckDuckGo
 - **Free APIs**: All tools use free APIs or web scraping (no paid subscriptions required)
 - **Easy Integration**: Simple Python interface for each search tool
 - **Rich Metadata**: Detailed results including titles, abstracts, citations, and more
@@ -36,6 +36,7 @@ While all tools work without API keys, some offer higher rate limits with authen
 
 - **Semantic Scholar**: Get an API key at https://www.semanticscholar.org/product/api
 - **PubMed/NCBI**: Get an API key at https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/
+- **GitHub**: Get a personal access token at https://github.com/settings/tokens (recommended for higher rate limits)
 
 ## Quick Start
 
@@ -137,6 +138,90 @@ pub = crossref.get_by_doi("10.1038/nature12373")
 # Search by author
 author_pubs = crossref.search_by_author("Einstein", rows=10)
 ```
+
+### GitHub Search
+
+Search for code, repositories, issues, and users on GitHub with popularity ranking.
+
+```python
+from search_tools import GitHubSearch
+
+# Initialize (optionally with token for higher rate limits)
+github = GitHubSearch()
+# With token: github = GitHubSearch(token="your-github-token")
+
+# Search repositories (ranked by stars by default)
+results = github.search_repositories(
+    "machine learning",
+    language="python",
+    min_stars=1000,
+    sort="stars",
+    per_page=10
+)
+
+for repo in results['items']:
+    print(f"{repo['full_name']} - ⭐ {repo['stars']:,}")
+    print(f"  {repo['description']}")
+    print(f"  Language: {repo['language']}, Forks: {repo['forks']:,}")
+    print(f"  {repo['url']}")
+    print()
+
+# Search code
+code_results = github.search_code(
+    "def transformer",
+    language="python",
+    extension="py"
+)
+
+for item in code_results['items']:
+    repo = item['repository']
+    print(f"{repo['full_name']}/{item['path']}")
+    print(f"  Stars: {repo['stars']:,}, Language: {repo['language']}")
+    print(f"  {item['url']}")
+
+# Get trending repositories
+trending = github.get_trending_repositories(language="python", since="weekly")
+
+for repo in trending[:5]:
+    print(f"{repo['full_name']} - ⭐ {repo['stars']:,}")
+
+# Search issues (great for finding "good first issue" tasks)
+issues = github.search_issues(
+    "bug",
+    state="open",
+    labels=["good first issue"],
+    sort="created"
+)
+
+for issue in issues['items']:
+    print(f"#{issue['number']}: {issue['title']}")
+    print(f"  Labels: {', '.join(issue['labels'])}")
+    print(f"  {issue['url']}")
+
+# Search users
+users = github.search_users("machine learning", min_followers=1000)
+
+for user in users['items']:
+    print(f"{user['login']} - {user['followers']:,} followers")
+    print(f"  {user['url']}")
+
+# Get specific repository details
+repo_details = github.get_repository("huggingface", "transformers")
+print(f"Stars: {repo_details['stars']:,}")
+print(f"Forks: {repo_details['forks']:,}")
+print(f"Topics: {', '.join(repo_details['topics'])}")
+
+# Check rate limit
+rate_limit = github.get_rate_limit()
+print(f"Remaining: {rate_limit['resources']['search']['remaining']}")
+```
+
+**Rate Limits:**
+- Unauthenticated: 60 requests/hour
+- Authenticated: 5000 requests/hour
+- Code search: 10 requests/minute (regardless of authentication)
+
+**Popularity Ranking**: All search methods support sorting by stars, forks, and other metrics to find the most popular results.
 
 ### Google Search
 
@@ -309,6 +394,7 @@ Be respectful of API rate limits:
 - **Semantic Scholar**: 1 request per second without API key, 10/sec with key
 - **PubMed**: 3 requests per second without API key, 10/sec with key
 - **CrossRef**: Up to 50 requests per second (polite pool with email)
+- **GitHub**: 60 requests/hour without token, 5000/hour with token; code search limited to 10/min
 - **Wikipedia**: No strict limit, but be reasonable
 - **DuckDuckGo**: No strict limit, but may encounter rate limiting
 - **Google**: Subject to detection and CAPTCHAs; use sparingly
