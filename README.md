@@ -4,10 +4,13 @@ A comprehensive collection of search tools designed for language agents, providi
 
 ## Features
 
-- **Multiple Search Engines**: Arxiv, Semantic Scholar, PubMed, CrossRef, GitHub, Google, Wikipedia, DuckDuckGo
+- **Academic Search**: Arxiv, Semantic Scholar, PubMed, CrossRef
+- **Code Search**: GitHub (with popularity ranking)
+- **Financial/Stock Market**: Yahoo Finance, Alpha Vantage, Financial News
+- **General Search**: Google, Wikipedia, DuckDuckGo
 - **Free APIs**: All tools use free APIs or web scraping (no paid subscriptions required)
 - **Easy Integration**: Simple Python interface for each search tool
-- **Rich Metadata**: Detailed results including titles, abstracts, citations, and more
+- **Rich Metadata**: Detailed results including titles, abstracts, citations, financial metrics, and more
 - **Rate Limiting**: Built-in respect for API rate limits
 
 ## Installation
@@ -37,6 +40,8 @@ While all tools work without API keys, some offer higher rate limits with authen
 - **Semantic Scholar**: Get an API key at https://www.semanticscholar.org/product/api
 - **PubMed/NCBI**: Get an API key at https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/
 - **GitHub**: Get a personal access token at https://github.com/settings/tokens (recommended for higher rate limits)
+- **Alpha Vantage**: Get a free API key at https://www.alphavantage.co/support/#api-key (required for Alpha Vantage)
+- **NewsAPI**: Get a free API key at https://newsapi.org/register (optional for financial news)
 
 ## Quick Start
 
@@ -223,6 +228,163 @@ print(f"Remaining: {rate_limit['resources']['search']['remaining']}")
 
 **Popularity Ranking**: All search methods support sorting by stars, forks, and other metrics to find the most popular results.
 
+### Yahoo Finance Search
+
+Search for stock market data, company information, and financial metrics.
+
+```python
+from search_tools import YahooFinanceSearch
+
+yf = YahooFinanceSearch()
+
+# Get real-time stock quote
+quote = yf.get_quote("AAPL")
+print(f"${quote['current_price']} ({quote['change_percent']:+.2f}%)")
+print(f"Volume: {quote['volume']:,}")
+print(f"Market Cap: ${quote['market_cap']:,}")
+
+# Get historical data
+history = yf.get_historical_data("AAPL", period="1mo")
+for day in history[-5:]:
+    print(f"{day['date']}: ${day['close']}")
+
+# Get detailed company information
+info = yf.get_company_info("AAPL")
+print(f"{info['name']} - {info['sector']}")
+print(f"P/E Ratio: {info['pe_ratio']}")
+print(f"Dividend Yield: {info['dividend_yield']}")
+print(f"Description: {info['description'][:200]}...")
+
+# Get financial statements
+financials = yf.get_financial_statements("AAPL")
+# Returns income statement, balance sheet, cash flow
+
+# Get analyst recommendations
+recommendations = yf.get_recommendations("AAPL")
+for rec in recommendations[-5:]:
+    print(f"{rec['date']}: {rec['firm']} - {rec['to_grade']}")
+
+# Compare multiple stocks
+comparison = yf.compare_stocks(['AAPL', 'MSFT', 'GOOGL'])
+for stock in comparison:
+    print(f"{stock['symbol']}: ${stock['current_price']} (PE: {stock['pe_ratio']})")
+
+# Get trending/most active stocks
+trending = yf.get_trending_stocks()
+for stock in trending[:10]:
+    print(f"{stock['symbol']}: ${stock['current_price']} - Vol: {stock['volume']:,}")
+```
+
+**No API key required** - Uses free Yahoo Finance data via yfinance library.
+
+### Alpha Vantage Search
+
+Advanced financial data, technical indicators, and fundamental analysis.
+
+```python
+from search_tools import AlphaVantageSearch
+
+# Initialize with API key (get free at https://www.alphavantage.co/support/#api-key)
+av = AlphaVantageSearch(api_key="your-api-key")
+
+# Search for stock symbols
+results = av.search_symbols("Tesla")
+for match in results:
+    print(f"{match['symbol']}: {match['name']} ({match['region']})")
+
+# Get real-time quote
+quote = av.get_quote("TSLA")
+print(f"${quote['price']} ({quote['change_percent']}%)")
+
+# Get intraday data (5-minute intervals)
+intraday = av.get_intraday_data("TSLA", interval="5min")
+for datapoint in intraday[:10]:
+    print(f"{datapoint['timestamp']}: ${datapoint['close']}")
+
+# Get daily historical data
+daily = av.get_daily_data("TSLA", outputsize="compact")
+
+# Technical indicators - Simple Moving Average (SMA)
+sma = av.get_sma("TSLA", interval="daily", time_period=20)
+print(f"20-day SMA: ${sma[0]['sma']}")
+
+# Technical indicators - RSI
+rsi = av.get_rsi("TSLA", interval="daily", time_period=14)
+print(f"RSI: {rsi[0]['rsi']}")
+
+# Company overview and fundamentals
+overview = av.get_company_overview("TSLA")
+print(f"{overview['name']} - {overview['sector']}")
+print(f"Market Cap: ${overview['market_cap']:,}")
+print(f"P/E Ratio: {overview['pe_ratio']}")
+print(f"EPS: ${overview['eps']}")
+print(f"Profit Margin: {overview['profit_margin']}")
+
+# Earnings data
+earnings = av.get_earnings("TSLA")
+for q in earnings['quarterly'][:4]:
+    print(f"Q{q['fiscal_quarter']}: EPS ${q['reported_eps']}")
+
+# News and sentiment analysis
+news = av.get_news_sentiment(tickers="TSLA", limit=10)
+for article in news:
+    print(f"{article['title']}")
+    print(f"  Sentiment: {article['sentiment']} ({article['sentiment_score']})")
+    print(f"  Source: {article['source']}")
+```
+
+**Free API key required** - 5 calls/minute, 500 calls/day on free tier.
+
+### Financial News Search
+
+Search financial news from multiple sources.
+
+```python
+from search_tools import FinancialNewsSearch
+
+# Initialize with NewsAPI key (optional but recommended)
+news = FinancialNewsSearch(newsapi_key="your-newsapi-key")
+
+# Search for company-specific news
+apple_news = news.search_company_news("Apple Inc", days=7)
+for article in apple_news:
+    print(f"{article['title']}")
+    print(f"  Source: {article['source']}")
+    print(f"  Published: {article['published_at']}")
+    print(f"  {article['url']}")
+
+# Get top business headlines
+headlines = news.get_top_headlines(category="business")
+for article in headlines:
+    print(f"{article['title']} - {article['source']}")
+
+# Search market news
+market_news = news.search_market_news("stock market", days=1)
+
+# Search earnings news
+earnings_news = news.search_earnings_news(days=7)
+
+# Search cryptocurrency news
+crypto_news = news.search_crypto_news("Bitcoin", days=3)
+
+# Search by specific source
+reuters = news.search_by_source("Reuters", query="tech stocks", days=7)
+
+# Get list of financial news sources
+sources = news.get_financial_sources()
+print(f"Available sources: {', '.join(sources)}")
+
+# General news search with filters
+results = news.search_news(
+    query="Federal Reserve interest rates",
+    from_date="2024-01-01",
+    sort_by="publishedAt",
+    page_size=20
+)
+```
+
+**Optional API key** - NewsAPI free tier: 100 requests/day.
+
 ### Google Search
 
 General web search using Playwright (web scraping).
@@ -395,6 +557,9 @@ Be respectful of API rate limits:
 - **PubMed**: 3 requests per second without API key, 10/sec with key
 - **CrossRef**: Up to 50 requests per second (polite pool with email)
 - **GitHub**: 60 requests/hour without token, 5000/hour with token; code search limited to 10/min
+- **Yahoo Finance**: No strict API limit (uses yfinance library)
+- **Alpha Vantage**: 5 requests per minute, 500 requests per day (free tier)
+- **Financial News (NewsAPI)**: 100 requests per day (free tier)
 - **Wikipedia**: No strict limit, but be reasonable
 - **DuckDuckGo**: No strict limit, but may encounter rate limiting
 - **Google**: Subject to detection and CAPTCHAs; use sparingly

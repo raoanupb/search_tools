@@ -40,6 +40,30 @@ def test_github_import():
     assert github is not None
 
 
+def test_alpha_vantage_import():
+    """Test that AlphaVantageSearch can be imported."""
+    from search_tools import AlphaVantageSearch
+    # Requires API key, so just test import
+    assert AlphaVantageSearch is not None
+
+
+def test_financial_news_import():
+    """Test that FinancialNewsSearch can be imported and initialized."""
+    from search_tools import FinancialNewsSearch
+    news = FinancialNewsSearch()  # API key is optional
+    assert news is not None
+
+
+def test_yahoo_finance_import():
+    """Test that YahooFinanceSearch can be imported (requires yfinance)."""
+    try:
+        from search_tools import YahooFinanceSearch
+        yf = YahooFinanceSearch()
+        assert yf is not None
+    except ImportError:
+        pytest.skip("yfinance library not installed")
+
+
 def test_wikipedia_import():
     """Test that WikipediaSearch can be imported and initialized."""
     from search_tools import WikipediaSearch
@@ -81,6 +105,8 @@ def test_all_exports():
         'CrossRefSearch',
         'GitHubSearch',
         'WikipediaSearch',
+        'AlphaVantageSearch',
+        'FinancialNewsSearch',
     ]
     assert hasattr(search_tools, '__all__')
     # Check that all required exports are present

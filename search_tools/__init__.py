@@ -7,6 +7,9 @@ This package provides various search capabilities including:
 - PubMed: Biomedical and life sciences literature
 - CrossRef: DOI-based academic paper search
 - GitHub: Code and repository search
+- Yahoo Finance: Stock market data and company information
+- Alpha Vantage: Advanced financial data and technical indicators
+- Financial News: Financial news from multiple sources
 - Google: General web search
 - Wikipedia: Encyclopedia search
 - DuckDuckGo: Privacy-focused web search
@@ -19,6 +22,8 @@ from .pubmed_search import PubMedSearch
 from .crossref_search import CrossRefSearch
 from .wikipedia_search import WikipediaSearch
 from .github_search import GitHubSearch
+from .alpha_vantage_search import AlphaVantageSearch
+from .financial_news_search import FinancialNewsSearch
 
 # Import tools with optional dependencies
 __all__ = [
@@ -28,7 +33,16 @@ __all__ = [
     'CrossRefSearch',
     'WikipediaSearch',
     'GitHubSearch',
+    'AlphaVantageSearch',
+    'FinancialNewsSearch',
 ]
+
+# Try to import YahooFinanceSearch (requires yfinance)
+try:
+    from .yahoo_finance_search import YahooFinanceSearch
+    __all__.append('YahooFinanceSearch')
+except ImportError:
+    pass
 
 # Try to import GoogleSearch (requires playwright)
 try:

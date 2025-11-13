@@ -7,6 +7,9 @@ playwright>=1.40.0
 # For DuckDuckGo Search
 duckduckgo-search>=4.0.0
 
+# For Yahoo Finance (stock market data)
+yfinance>=0.2.0
+
 # Optional but recommended for development
 pytest>=7.4.0
 pytest-cov>=4.1.0
