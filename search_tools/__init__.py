@@ -13,6 +13,8 @@ This package provides various search capabilities including:
 - Google: General web search
 - Wikipedia: Encyclopedia search
 - DuckDuckGo: Privacy-focused web search
+
+Also includes LLM formatters to convert search results to markdown for prompt injection.
 """
 
 # Import core tools (no optional dependencies)
@@ -25,8 +27,28 @@ from .github_search import GitHubSearch
 from .alpha_vantage_search import AlphaVantageSearch
 from .financial_news_search import FinancialNewsSearch
 
+# Import formatters
+from .formatters import (
+    ArxivFormatter,
+    SemanticScholarFormatter,
+    PubMedFormatter,
+    CrossRefFormatter,
+    GitHubFormatter,
+    YahooFinanceFormatter,
+    AlphaVantageFormatter,
+    FinancialNewsFormatter,
+    WikipediaFormatter,
+    DuckDuckGoFormatter,
+    GoogleFormatter,
+    format_arxiv_results,
+    format_github_repos,
+    format_stock_quote,
+    format_news,
+)
+
 # Import tools with optional dependencies
 __all__ = [
+    # Search tools
     'ArxivSearch',
     'SemanticScholarSearch',
     'PubMedSearch',
@@ -35,6 +57,23 @@ __all__ = [
     'GitHubSearch',
     'AlphaVantageSearch',
     'FinancialNewsSearch',
+    # Formatters
+    'ArxivFormatter',
+    'SemanticScholarFormatter',
+    'PubMedFormatter',
+    'CrossRefFormatter',
+    'GitHubFormatter',
+    'YahooFinanceFormatter',
+    'AlphaVantageFormatter',
+    'FinancialNewsFormatter',
+    'WikipediaFormatter',
+    'DuckDuckGoFormatter',
+    'GoogleFormatter',
+    # Convenience functions
+    'format_arxiv_results',
+    'format_github_repos',
+    'format_stock_quote',
+    'format_news',
 ]
 
 # Try to import YahooFinanceSearch (requires yfinance)

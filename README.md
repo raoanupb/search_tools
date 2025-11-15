@@ -564,6 +564,134 @@ Be respectful of API rate limits:
 - **DuckDuckGo**: No strict limit, but may encounter rate limiting
 - **Google**: Subject to detection and CAPTCHAs; use sparingly
 
+## LLM Formatters - Convert Results to Markdown
+
+All search tools include corresponding formatters to convert search results into LLM-friendly markdown format. This makes it easy to inject search results into prompts for context-aware AI responses.
+
+### Quick Start with Formatters
+
+```python
+from search_tools import ArxivSearch, ArxivFormatter
+
+# Search for papers
+arxiv = ArxivSearch()
+results = arxiv.search("large language models", max_results=5)
+
+# Convert to markdown for LLM prompts
+markdown = ArxivFormatter.format_results(results, query="large language models")
+
+# Use in LLM prompt
+llm_prompt = f"""Based on the following research papers:
+
+{markdown}
+
+Summarize the key findings about large language models."""
+```
+
+### Available Formatters
+
+All formatters convert search results to well-structured markdown:
+
+- **ArxivFormatter** - Academic papers with authors, abstracts, categories
+- **SemanticScholarFormatter** - Papers with citation counts
+- **PubMedFormatter** - Medical articles with abstracts and keywords
+- **CrossRefFormatter** - Publications with DOIs
+- **GitHubFormatter** - Repositories and code with star rankings
+- **YahooFinanceFormatter** - Stock quotes, company info, comparisons
+- **AlphaVantageFormatter** - Financial data and news sentiment
+- **FinancialNewsFormatter** - News articles with sources
+- **WikipediaFormatter** - Articles and summaries
+- **DuckDuckGoFormatter** - Search results
+- **GoogleFormatter** - Search results
+
+### Formatter Examples
+
+```python
+from search_tools import (
+    GitHubSearch,
+    GitHubFormatter,
+    YahooFinanceSearch,
+    YahooFinanceFormatter,
+)
+
+# GitHub repositories
+github = GitHubSearch()
+repos = github.search_repositories("machine learning", language="python", per_page=5)
+markdown = GitHubFormatter.format_repository_results(repos)
+
+# Stock market data
+yf = YahooFinanceSearch()
+quote = yf.get_quote("AAPL")
+markdown = YahooFinanceFormatter.format_quote(quote)
+
+# Company comparison
+comparison = yf.compare_stocks(['AAPL', 'MSFT', 'GOOGL'])
+markdown = YahooFinanceFormatter.format_comparison(comparison)
+```
+
+### Convenience Functions
+
+Quick access functions for common formatters:
+
+```python
+from search_tools import (
+    format_arxiv_results,
+    format_github_repos,
+    format_stock_quote,
+    format_news,
+)
+
+# Use convenience functions
+papers_md = format_arxiv_results(papers, query="AI")
+repos_md = format_github_repos(repo_results, query="ML")
+quote_md = format_stock_quote(stock_quote)
+news_md = format_news(articles, query="tech")
+```
+
+### Multi-Source Agent Workflow
+
+Combine multiple sources for comprehensive LLM context:
+
+```python
+from search_tools import (
+    ArxivSearch, ArxivFormatter,
+    GitHubSearch, GitHubFormatter,
+    WikipediaSearch, WikipediaFormatter,
+)
+
+topic = "quantum computing"
+
+# Gather from multiple sources
+arxiv = ArxivSearch()
+github = GitHubSearch()
+wiki = WikipediaSearch()
+
+papers = arxiv.search(topic, max_results=3)
+repos = github.search_repositories(topic, language="python", per_page=3)
+articles = wiki.search(topic, limit=2)
+
+# Format everything
+papers_md = ArxivFormatter.format_results(papers, query=topic)
+repos_md = GitHubFormatter.format_repository_results(repos, query=topic)
+wiki_md = WikipediaFormatter.format_results(articles, query=topic)
+
+# Create comprehensive prompt
+llm_prompt = f"""# Research on {topic}
+
+## Academic Papers
+{papers_md}
+
+## Code Repositories
+{repos_md}
+
+## Background Knowledge
+{wiki_md}
+
+Based on this information, provide a comprehensive overview of {topic}."""
+```
+
+See `examples/llm_formatter_examples.py` for more detailed examples.
+
 ## Use Cases for Language Agents
 
 ### Research Assistant
